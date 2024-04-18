@@ -1,10 +1,19 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+// const url =
+//   "https://api.themoviedb.org/3/search/movie?include_adult=false&language=en-US&page=1";
+// const options = { method: "GET", headers: { accept: "application/json" } };
+
+// fetch(url, options)
+//   .then((res) => res.json())
+//   .then((json) => console.log(json))
+//   .catch((err) => console.error("error:" + err));
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <App />
