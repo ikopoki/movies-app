@@ -14,7 +14,7 @@ export default class MovieService {
     const url = `https://api.themoviedb.org/3/search/movie?query=${keyword}&include_adult=true&language=en-US&page=${page}`
 
     const res = await fetch(url, this._options)
-    if (!res.ok) {  
+    if (!res.ok) {
       throw new Error(`Could not fetch ${url}, received ${res.status}`)
     }
 
@@ -26,7 +26,7 @@ export default class MovieService {
     const url = `https://api.themoviedb.org/3/search/movie?query=${keyword}&include_adult=true&language=en-US&page=1`
 
     const res = await fetch(url, this._options)
-    if (!res.ok) {  
+    if (!res.ok) {
       throw new Error(`Could not fetch ${url}, received ${res.status}`)
     }
 
