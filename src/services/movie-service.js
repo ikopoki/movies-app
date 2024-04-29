@@ -1,36 +1,89 @@
-/* eslint-disable no-underscore-dangle */
-export default class MovieService {
-  _options = {
-    method: 'GET',
-    headers: {
-      accept: 'application/json',
-      Authorization:
-        'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmOGFkODUxZDFjNjY0ZjM4MTFkYmU4NzViMzYxYzE1ZiIsInN1YiI6IjY2MjEyNjViZTY0MGQ2MDE4NmMzNGQyYyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.w1hF6JInPKwMncQAaQ0zNrFUyhsZtMnx2XMfDPZj8TI',
-    },
+/* eslint-disable arrow-body-style */
+const createMovieService = (apiKey) => {
+  const apiBase = 'https://api.themoviedb.org/3'
+
+  const getResource = async (url) => {
+    const result = await fetch(`${apiBase}${url}`)
+    if (!result.ok) {
+      throw new Error(`Could not fetch ${url}, received ${result.status}`)
+    }
+    return result.json()
   }
 
-  // eslint-disable-next-line default-param-last
-  async getResource(page, keyword) {
-    const url = `https://api.themoviedb.org/3/search/movie?query=${keyword}&include_adult=true&language=en-US&page=${page}`
-
-    const res = await fetch(url, this._options)
-    if (!res.ok) {
-      throw new Error(`Could not fetch ${url}, received ${res.status}`)
-    }
-
-    const getMovie = await res.json()
-    return getMovie.results
+  const getMovies = async (query = 'fight club', currentPage = 1) => {
+    return getResource(`/search/movie?api_key=${apiKey}&language=en-US&query=${query}&page=${currentPage}`)
   }
 
-  async getPages(keyword) {
-    const url = `https://api.themoviedb.org/3/search/movie?query=${keyword}&include_adult=true&language=en-US&page=1`
+  const getGenres = async () => {
+    return getResource(`/genre/movie/list?api_key=${apiKey}&language=en-US`)
+  }
 
-    const res = await fetch(url, this._options)
-    if (!res.ok) {
-      throw new Error(`Could not fetch ${url}, received ${res.status}`)
-    }
+  const getQuestSession = async () => {
+    const data = await fetch(`https://api.themoviedb.org/3/authentication/guest_session/new?api_key=${apiKey}`)
+    return data.json()
+  }
 
-    const getPages = await res.json()
-    return getPages.total_pages
+  const postMovieRating = async (movieId, rating) => {
+    const token = localStorage.getItem('token')
+    const data = await fetch(`${apiBase}/movie/${movieId}/rating?api_key=${apiKey}&guest_session_id=${token}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+      },
+      body: JSON.stringify({
+        value: rating,
+      }),
+    })
+    return data.json()
+  }
+
+  const deleteRating = async (movieId) => {
+    const token = localStorage.getItem('token')
+    const data = await fetch(`${apiBase}/movie/${movieId}/rating?api_key=${apiKey}&guest_session_id=${token}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+      },
+    })
+    return data
+  }
+
+  const getRatedMovies = async (page = 1) => {
+    const token = localStorage.getItem('token')
+    const data = await fetch(`${apiBase}/guest_session/${token}/rated/movies?api_key=${apiKey}&page=${page}`)
+    return data.json()
+  }
+
+  const getLocalGuestSessionToken = () => {
+    return localStorage.getItem('token')
+  }
+
+  const setLocalGuestSessionToken = (token) => {
+    localStorage.setItem('token', token)
+  }
+
+  const setLocalRating = (id, value) => {
+    localStorage.setItem(`Movie id: ${id}`, value)
+  }
+
+  const getLocalRating = (id) => {
+    return +localStorage.getItem(id)
+  }
+
+  return {
+    getMovies,
+    getGenres,
+    getQuestSession,
+    postMovieRating,
+    deleteRating,
+    getRatedMovies,
+    getLocalGuestSessionToken,
+    setLocalGuestSessionToken,
+    setLocalRating,
+    getLocalRating,
   }
 }
+
+const movieService = createMovieService('f8ad851d1c664f3811dbe875b361c15f')
+
+export default movieService
