@@ -1,24 +1,30 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
+/* eslint-disable no-restricted-globals */
+import React, { useState, useEffect } from 'react'
 import './movie.scss'
-import { format } from 'date-fns'
+import { format } from 'date-fns' 
 import { Progress, Rate } from 'antd'
 import { Consumer } from '../context/context'
-import movieService from '../../services/movie-service'
+import movieService from '../../services/movie-service.ts'
+import { MovieDataList, Genre } from '../../types/types.ts'
 
-export default function Movie({ img, title, overview, date, genreId, vote, idForRate, onRate }) {
+
+export default function Movie({ img, title, overview, date, genreId, vote, idForRate, onRate }: MovieDataList) {
   const [rating, setRating] = useState(0)
+
+  const maxId: Function = (): string => Math.random().toString(36).slice(2)
 
   useEffect(() => {
     setRating(movieService.getLocalRating(idForRate))
   }, [idForRate])
-  function cutText(str) {
+  function cutText(str: string): string {
     const truncatedText = str.replace(/^(.{0,90}\S*).*$/, '$1')
     return `${truncatedText}...`
   }
 
-  function ratingColor(n) {
+  function ratingColor(n: number): string {
     switch (true) {
       case n >= 0 && n <= 3:
         return '#E90000'
@@ -51,18 +57,23 @@ export default function Movie({ img, title, overview, date, genreId, vote, idFor
             <Progress
               type="circle"
               percent={vote * 10}
-              format={(percent) => (percent / 10).toFixed(1)}
+              format={(percent?: number): string => {
+                if(!percent) {
+                  return ''
+                }
+                return (percent / 10).toFixed(1)
+              }}
               strokeColor={ratingColor(vote)}
               className="movie-info__rate"
             />
             <div className="box">
               <h1 className="box__title">{title}</h1>
               <p className="box__date">{date ? format(new Date(date), 'MMM dd, yyyy') : 'No data'}</p>
-              {genres.map((el) => {
-                if (genreId.includes(el.id)) {
+              {genres.map((genre: Genre) => {
+                if (genreId.includes(genre.id)) {
                   return (
-                    <p className="box__genre" key={el.id}>
-                      {el.name}
+                    <p className="box__genre" key={maxId()}>
+                      {genre.name}
                     </p>
                   )
                 }
@@ -88,17 +99,4 @@ export default function Movie({ img, title, overview, date, genreId, vote, idFor
   )
 }
 
-Movie.propTypes = {
-  img: PropTypes.string,
-  title: PropTypes.string.isRequired,
-  overview: PropTypes.string.isRequired,
-  date: PropTypes.string,
-  genreId: PropTypes.arrayOf(PropTypes.number).isRequired,
-  vote: PropTypes.number.isRequired,
-  idForRate: PropTypes.number.isRequired,
-  onRate: PropTypes.func.isRequired,
-}
-Movie.defaultProps = {
-  img: '',
-  date: '',
-}
+

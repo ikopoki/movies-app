@@ -1,15 +1,44 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { useState, useEffect } from 'react'
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
+/* eslint-disable import/extensions */
+import React, { useState, useEffect } from 'react'
 import './app.scss'
-import { debounce } from 'lodash'
 import { Offline, Online } from 'react-detect-offline'
 import { Input, Spin, Alert, Pagination, Tabs } from 'antd'
-import MovieList from '../movie-list/movie-list'
-import movieService from '../../services/movie-service'
-import ErrorIndicator from '../error/error'
-import { Provider } from '../context/context'
+import MovieList from '../movie-list/movie-list.tsx'
+import movieService from '../../services/movie-service.ts'
+import ErrorIndicator from '../error/error.tsx'
+import { Provider } from '../context/context.jsx'
+import { Items } from '../../types/types.ts'
 
-export default function App() {
+
+function debounce <T extends (...args: any[]) => any>(
+  func: T,
+  delay: number
+): { run: (...args: Parameters<T>) => void; cancel: () => void } {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null
+
+  const run = (...args: Parameters<T>) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+    }
+    timeoutId = setTimeout(() => {
+      func.apply(this, args)
+    }, delay)
+  }
+
+  const cancel = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+      timeoutId = null
+    }
+  }
+
+  return { run, cancel }
+}
+
+export default function App(): React.JSX.Element {
   const [moviesData, setMoviesData] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -21,7 +50,7 @@ export default function App() {
   const [genres, setGenres] = useState([])
   const [rate, setRate] = useState([])
 
-  const getDataMovies = async () => {
+  const getDataMovies = async (): Promise<any> => {
     if (searchQuery.trim().length === 0) {
       return
     }
@@ -38,7 +67,7 @@ export default function App() {
     }
   }
 
-  const loadRatedMovies = async (page) => {
+  const loadRatedMovies = async (page: number): Promise<void> => {
     try {
       setLoading(true)
       setError(null)
@@ -52,33 +81,33 @@ export default function App() {
     }
   }
 
-  const onPaginationChange = (page) => {
+  const onPaginationChange = (page: number): void => {
     setCurrentPage(page)
   }
 
-  const onPaginationChangeRate = (page) => {
+  const onPaginationChangeRate = (page: number): void => {
     setCurrentPageRate(page)
     loadRatedMovies(page)
   }
 
-  const onSearchChange = (e) => {
+  const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setSearchQuery(e.target.value)
   }
 
   useEffect(() => {
-    const debouncedGetDataMovies = debounce(() => getDataMovies(), 600)
-    debouncedGetDataMovies()
+    const { run, cancel } = debounce(() => getDataMovies(), 600)
+    run()
 
     return () => {
-      debouncedGetDataMovies.cancel()
+      cancel()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery, currentPage])
 
   useEffect(() => {
-    const load = async () => {
+    const load = async (): Promise<void> => {
       if (!movieService.getLocalGuestSessionToken()) {
-        const session = await movieService.getQuestSession()
+        const session = await movieService.getGuestSession()
         movieService.setLocalGuestSessionToken(session.guest_session_id)
       }
 
@@ -91,24 +120,24 @@ export default function App() {
     load()
   }, [])
 
-  const onRate = async (id, value) => {
+  const onRate = async (id: number, value: number) => {
     if (value > 0) {
-      await movieService.postMovieRating(id, value)
-      movieService.setLocalRating(id, value)
+      await movieService.postMovieRating(typeof id === 'string' ? Number(id) : id, value)
+      movieService.setLocalRating(id, value.toString())
       const ratedMovies = await movieService.getRatedMovies()
       setRate(ratedMovies.results)
     } else {
-      await movieService.deleteRating(id)
-      localStorage.removeItem(id)
+      await movieService.deleteRating(typeof id === 'string' ? Number(id) : id)
+      localStorage.removeItem(typeof id === 'string' ? id : id.toString())
       const ratedMovies = await movieService.getRatedMovies()
       setRate(ratedMovies.results)
     }
   }
 
-  const spinner = loading ? <Spin /> : null
-  const content = !loading ? <MovieList moviesData={moviesData} onRate={onRate} /> : null
-  const errorIndicator = error ? <ErrorIndicator /> : null
-  const paginationPanelSearch =
+  const spinner: React.JSX.Element | null = loading ? <Spin /> : null
+  const content: React.JSX.Element | null = !loading ? <MovieList moviesData={moviesData} onRate={onRate} /> : null
+  const errorIndicator: React.JSX.Element | null = error ? <ErrorIndicator /> : null
+  const paginationPanelSearch: React.JSX.Element | null =
     !loading && !error && searchQuery ? (
       <Pagination
         current={currentPage}
@@ -119,7 +148,7 @@ export default function App() {
       />
     ) : null
 
-  const paginationPanelRated = !error ? (
+  const paginationPanelRated: React.JSX.Element | null = !error ? (
     <Pagination
       current={currentPageRate}
       total={totalResultsRate}
@@ -139,7 +168,7 @@ export default function App() {
     )
   }
 
-  const onTabsChange = (active) => {
+  const onTabsChange = (active: string) => {
     if (active === '2') {
       loadRatedMovies(1)
     }
@@ -148,7 +177,7 @@ export default function App() {
     }
   }
 
-  const items = [
+  const items: Items[] = [
     {
       key: '1',
       label: `Search`,
