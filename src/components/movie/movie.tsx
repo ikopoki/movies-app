@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 /* eslint-disable no-restricted-globals */
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import './movie.scss'
 import { format } from 'date-fns' 
 import { Progress, Rate } from 'antd'
@@ -10,8 +10,7 @@ import { Consumer } from '../context/context'
 import movieService from '../../services/movie-service.ts'
 import { MovieDataList, Genre } from '../../types/types.ts'
 
-
-export default function Movie({ img, title, overview, date, genreId, vote, idForRate, onRate }: MovieDataList) {
+function Movie({ img, title, overview, date, genreId, vote, idForRate, onRate }: MovieDataList) {
   const [rating, setRating] = useState(0)
 
   const maxId: Function = (): string => Math.random().toString(36).slice(2)
@@ -19,23 +18,24 @@ export default function Movie({ img, title, overview, date, genreId, vote, idFor
   useEffect(() => {
     setRating(movieService.getLocalRating(idForRate))
   }, [idForRate])
+
   function cutText(str: string): string {
     const truncatedText = str.replace(/^(.{0,90}\S*).*$/, '$1')
     return `${truncatedText}...`
   }
 
-  function ratingColor(n: number): string {
+  const ratingColor = useMemo(() => {
     switch (true) {
-      case n >= 0 && n <= 3:
+      case vote >= 0 && vote <= 3:
         return '#E90000'
-      case n > 3 && n <= 5:
+      case vote > 3 && vote <= 5:
         return '#E97E00'
-      case n > 5 && n <= 7:
+      case vote > 5 && vote <= 7:
         return '#E9D100'
       default:
         return '#66E900'
     }
-  }
+  }, [vote])
 
   return (
     <Consumer>
@@ -63,7 +63,7 @@ export default function Movie({ img, title, overview, date, genreId, vote, idFor
                 }
                 return (percent / 10).toFixed(1)
               }}
-              strokeColor={ratingColor(vote)}
+              strokeColor={ratingColor}
               className="movie-info__rate"
             />
             <div className="box">
@@ -99,4 +99,4 @@ export default function Movie({ img, title, overview, date, genreId, vote, idFor
   )
 }
 
-
+export default React.memo(Movie)
