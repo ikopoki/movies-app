@@ -1,8 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-undef */
+/* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 /* eslint-disable import/extensions */
-import React, { useState, useEffect } from 'react'
+/* eslint-disable no-restricted-globals */
+
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import './app.scss'
 import { Offline, Online } from 'react-detect-offline'
 import { Input, Spin, Alert, Pagination, Tabs } from 'antd'
@@ -10,10 +13,9 @@ import MovieList from '../movie-list/movie-list.tsx'
 import movieService from '../../services/movie-service.ts'
 import ErrorIndicator from '../error/error.tsx'
 import { Provider } from '../context/context.jsx'
-import { Items } from '../../types/types.ts'
+import { Items, MovieData, MovieDataList } from '../../types/types.ts'
 
-
-function debounce <T extends (...args: any[]) => any>(
+function debounce<T extends (...args: any[]) => any>(
   func: T,
   delay: number
 ): { run: (...args: Parameters<T>) => void; cancel: () => void } {
@@ -39,18 +41,18 @@ function debounce <T extends (...args: any[]) => any>(
 }
 
 export default function App(): React.JSX.Element {
-  const [moviesData, setMoviesData] = useState([])
+  const [moviesData, setMoviesData] = useState<MovieData[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<Error | null>(null)
   const [searchQuery, setSearchQuery] = useState('fight  club')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalResults, setTotalResults] = useState(0)
   const [currentPageRate, setCurrentPageRate] = useState(1)
   const [totalResultsRate, setTotalResultsRate] = useState(0)
-  const [genres, setGenres] = useState([])
-  const [rate, setRate] = useState([])
+  const [genres, setGenres] = useState< {id: number; name: string}[]>([])
+  const [rate, setRate] = useState<MovieData[]>([])
 
-  const getDataMovies = async (): Promise<any> => {
+  const getDataMovies = useCallback(async (): Promise<any> => {
     if (searchQuery.trim().length === 0) {
       return
     }
@@ -61,13 +63,13 @@ export default function App(): React.JSX.Element {
       setTotalResults(data.total_pages)
       setMoviesData(data.results)
     } catch (err) {
-      setError(err)
+      setError(err as Error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [searchQuery, currentPage])
 
-  const loadRatedMovies = async (page: number): Promise<void> => {
+  const loadRatedMovies = useCallback( async (page: number): Promise<void> => {
     try {
       setLoading(true)
       setError(null)
@@ -75,11 +77,11 @@ export default function App(): React.JSX.Element {
       setTotalResultsRate(data.total_results)
       setRate(data.results)
     } catch (err) {
-      setError(err)
+      setError(err as Error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   const onPaginationChange = (page: number): void => {
     setCurrentPage(page)
@@ -120,7 +122,7 @@ export default function App(): React.JSX.Element {
     load()
   }, [])
 
-  const onRate = async (id: number, value: number) => {
+  const onRate = useCallback(async (id: number, value: number) => {
     if (value > 0) {
       await movieService.postMovieRating(typeof id === 'string' ? Number(id) : id, value)
       movieService.setLocalRating(id, value.toString())
@@ -132,12 +134,13 @@ export default function App(): React.JSX.Element {
       const ratedMovies = await movieService.getRatedMovies()
       setRate(ratedMovies.results)
     }
-  }
+    // eslint-disable-next-line
+  }, [movieService])
 
-  const spinner: React.JSX.Element | null = loading ? <Spin /> : null
-  const content: React.JSX.Element | null = !loading ? <MovieList moviesData={moviesData} onRate={onRate} /> : null
-  const errorIndicator: React.JSX.Element | null = error ? <ErrorIndicator /> : null
-  const paginationPanelSearch: React.JSX.Element | null =
+  const spinner: React.ReactNode = loading ? <Spin /> : null
+  const content: React.ReactNode = !loading ? <MovieList moviesData={moviesData} onRate={onRate} /> : null
+  const errorIndicator: React.ReactNode = error ? <ErrorIndicator /> : null
+  const paginationPanelSearch: React.ReactNode =
     !loading && !error && searchQuery ? (
       <Pagination
         current={currentPage}
@@ -148,7 +151,7 @@ export default function App(): React.JSX.Element {
       />
     ) : null
 
-  const paginationPanelRated: React.JSX.Element | null = !error ? (
+  const paginationPanelRated: React.ReactNode = !error ? (
     <Pagination
       current={currentPageRate}
       total={totalResultsRate}

@@ -1,8 +1,11 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-restricted-globals */
 export type Items = {
     key: string
     label: string
     children: React.JSX.Element
 }
+
 
 export type MovieData = {
     id: string
