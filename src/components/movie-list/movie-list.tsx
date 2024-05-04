@@ -1,19 +1,20 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 /* eslint-disable camelcase */
-import React from 'react'
+/* eslint-disable react/prop-types */
+import React, { memo } from 'react'
 import MovieItem from '../movie/movie.tsx'
 import './movie-list.scss'
 import { MovieData } from '../../types/types.ts'
 
-export default function MovieList({
-  moviesData,
-  onRate,
-}: {
+interface MovieListProps {
   moviesData: MovieData[]
   onRate: (id: number, rating: number) => void
-}) {
+}
+
+const MovieList: React.FC<MovieListProps> = memo(({ moviesData, onRate }) => {
   const maxId: Function = (): string => Math.random().toString(36).slice(2)
+
   const elem = moviesData.map((item: MovieData) => (
     <MovieItem
       key={maxId()}
@@ -28,4 +29,6 @@ export default function MovieList({
     />
   ))
   return <ul className="all-content">{elem}</ul>
-}
+})
+
+export default MovieList
