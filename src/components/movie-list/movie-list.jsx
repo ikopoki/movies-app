@@ -28,7 +28,7 @@ const MovieList = ({ moviesData, onRate }) => {
   return <ul className="all-content">{elem === undefined ? error : elem}</ul>
 }
 
-MovieList.propTypes = {
+MovieList.defaultProps = {
   moviesData: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
@@ -39,7 +39,7 @@ MovieList.propTypes = {
       genre_ids: PropTypes.arrayOf(PropTypes.number),
       vote_average: PropTypes.number.isRequired,
     }),
-  ).isRequired,
+  ),
   onRate: PropTypes.func.isRequired,
 }
 export default MovieList

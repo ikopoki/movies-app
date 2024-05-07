@@ -90,10 +90,12 @@ export default function App() {
 
       const dataGenre = await movieService.getGenres()
       const ratedMovies = await movieService.getRatedMovies()
-      if (dataGenre !== null  && ratedMovies !==  null) {
+
+      if(ratedMovies !== null && ratedMovies.results !== undefined) {
         setRate(ratedMovies.results)
-        setGenres(dataGenre.genres)
       }
+
+      setGenres(dataGenre.genres)
     }
 
     load()
@@ -104,12 +106,16 @@ export default function App() {
       await movieService.postMovieRating(id, value)
       movieService.setLocalRating(id, value)
       const ratedMovies = await movieService.getRatedMovies()
-      setRate(ratedMovies.results)
+      if (ratedMovies !== null && ratedMovies.results !== undefined) {
+        setRate(ratedMovies.results)
+      }
     } else {
       await movieService.deleteRating(id)
       localStorage.removeItem(id)
       const ratedMovies = await movieService.getRatedMovies()
-      setRate(ratedMovies.results)
+      if(ratedMovies !== null && ratedMovies.results !== undefined) {
+        setRate(ratedMovies.results)
+      }
     }
   }
 
