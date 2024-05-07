@@ -1,3 +1,4 @@
+
 .wrapper {
   display: flex;
   flex-wrap: wrap;
@@ -103,4 +104,47 @@
 
 .visual {
   height: 281px;
+}
+
+.visual img {
+  height: 280px;
+  width: 180px;
+}
+
+@media (max-width: 425px) {
+  .box {
+    margin: 0;
+  }
+
+  .visual {
+    height: 91px;
+    width: 60px;
+    margin-top: 6px;
+    margin-left: 10px;
+  }
+  .visual img {
+    height: 91px;
+    width: 60px;
+  }
+
+  .box__title {
+    margin-top: 4px;
+    margin-left: 13px;
+  }
+
+  .box__date  {
+    margin-top: 7px;
+    margin-left: 13px;
+  }
+
+  .box__genre {
+    margin-left: 13px;
+    margin-top: 7px;
+  }
+
+  .box__text {
+    margin-top: 29px;
+    margin-right: 0;
+    margin-left: -60px;
+  }
 }

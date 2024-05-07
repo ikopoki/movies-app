@@ -52,7 +52,9 @@ export default function App(): React.JSX.Element {
   const [genres, setGenres] = useState< {id: number; name: string}[]>([])
   const [rate, setRate] = useState<MovieData[]>([])
 
-  const getDataMovies = useCallback(async (): Promise<any> => {
+  
+
+  const getDataMovies = async (): Promise<any> => {
     if (searchQuery.trim().length === 0) {
       return
     }
@@ -67,9 +69,9 @@ export default function App(): React.JSX.Element {
     } finally {
       setLoading(false)
     }
-  }, [searchQuery, currentPage])
+  } 
 
-  const loadRatedMovies = useCallback( async (page: number): Promise<void> => {
+  const loadRatedMovies = async (page: number): Promise<void> => {
     try {
       setLoading(true)
       setError(null)
@@ -81,7 +83,7 @@ export default function App(): React.JSX.Element {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }
 
   const onPaginationChange = (page: number): void => {
     setCurrentPage(page)
@@ -107,35 +109,34 @@ export default function App(): React.JSX.Element {
   }, [searchQuery, currentPage])
 
   useEffect(() => {
-    const load = async (): Promise<void> => {
-      if (!movieService.getLocalGuestSessionToken()) {
-        const session = await movieService.getGuestSession()
-        movieService.setLocalGuestSessionToken(session.guest_session_id)
+      const load = async (): Promise<void> => {
+        if (!movieService.getLocalGuestSessionToken()) {
+          const session = await movieService.getGuestSession()
+          movieService.setLocalGuestSessionToken(session.guest_session_id)
+        }
+  
+        const dataGenre = await movieService.getGenres()
+        const ratedMovies = await movieService.getRatedMovies()
+        setRate(ratedMovies.results)
+        setGenres(dataGenre.genres)
       }
-
-      const dataGenre = await movieService.getGenres()
-      const ratedMovies = await movieService.getRatedMovies()
-      setRate(ratedMovies.results)
-      setGenres(dataGenre.genres)
-    }
-
-    load()
+  
+      load()
   }, [])
 
-  const onRate = useCallback(async (id: number, value: number) => {
+  const onRate = async (id, value) => {
     if (value > 0) {
-      await movieService.postMovieRating(typeof id === 'string' ? Number(id) : id, value)
-      movieService.setLocalRating(id, value.toString())
+      await movieService.postMovieRating(id, value)
+      movieService.setLocalRating(id, value)
       const ratedMovies = await movieService.getRatedMovies()
       setRate(ratedMovies.results)
     } else {
-      await movieService.deleteRating(typeof id === 'string' ? Number(id) : id)
-      localStorage.removeItem(typeof id === 'string' ? id : id.toString())
+      await movieService.deleteRating(id)
+      localStorage.removeItem(id)
       const ratedMovies = await movieService.getRatedMovies()
       setRate(ratedMovies.results)
     }
-    // eslint-disable-next-line
-  }, [movieService])
+  }
 
   const spinner: React.ReactNode = loading ? <Spin /> : null
   const content: React.ReactNode = !loading ? <MovieList moviesData={moviesData} onRate={onRate} /> : null
@@ -143,6 +144,7 @@ export default function App(): React.JSX.Element {
   const paginationPanelSearch: React.ReactNode =
     !loading && !error && searchQuery ? (
       <Pagination
+        className='pagination'
         current={currentPage}
         total={totalResults}
         onChange={onPaginationChange}
@@ -153,6 +155,7 @@ export default function App(): React.JSX.Element {
 
   const paginationPanelRated: React.ReactNode = !error ? (
     <Pagination
+      className='pagination'
       current={currentPageRate}
       total={totalResultsRate}
       onChange={onPaginationChangeRate}
@@ -173,7 +176,7 @@ export default function App(): React.JSX.Element {
 
   const onTabsChange = (active: string) => {
     if (active === '2') {
-      loadRatedMovies(1)
+      loadRatedMovies(currentPageRate)
     }
     if (active === '1') {
       getDataMovies()
@@ -199,8 +202,8 @@ export default function App(): React.JSX.Element {
       label: `Rated`,
       children: (
         <>
-          {paginationPanelRated}
           <MovieList moviesData={rate} onRate={onRate} />
+          {paginationPanelRated}
         </>
       ),
     },
@@ -210,7 +213,7 @@ export default function App(): React.JSX.Element {
     <div className="main">
       <Provider value={genres}>
         <Online>
-          <Tabs defaultActiveKey="1" items={items} onChange={onTabsChange} />
+          <Tabs defaultActiveKey='1' items={items} onChange={onTabsChange} />
         </Online>
         <Offline>
           <Alert message="Damn dude its 2024 and u got no money for the internet?" type="error" />

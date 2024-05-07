@@ -49,6 +49,7 @@ const createMovieService = (apiKey: string) => {
   }
 
   const getRatedMovies = async (page: number = 1): Promise<any> => {
+    console.log('called')
     const token = localStorage.getItem('token')
     const data = await fetch(`${apiBase}/guest_session/${token}/rated/movies?api_key=${apiKey}&page=${page}`)
     return data.json()

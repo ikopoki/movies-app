@@ -2,9 +2,10 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 /* eslint-disable no-restricted-globals */
-import React, { useState, useEffect, useMemo } from 'react'
+/* eslint-disable no-nested-ternary */
+import React, { useState, useEffect } from 'react'
 import './movie.scss'
-import { format } from 'date-fns' 
+import { format } from 'date-fns'
 import { Progress, Rate } from 'antd'
 import { Consumer } from '../context/context'
 import movieService from '../../services/movie-service.ts'
@@ -23,19 +24,6 @@ function Movie({ img, title, overview, date, genreId, vote, idForRate, onRate }:
     const truncatedText = str.replace(/^(.{0,90}\S*).*$/, '$1')
     return `${truncatedText}...`
   }
-
-  const ratingColor = useMemo(() => {
-    switch (true) {
-      case vote >= 0 && vote <= 3:
-        return '#E90000'
-      case vote > 3 && vote <= 5:
-        return '#E97E00'
-      case vote > 5 && vote <= 7:
-        return '#E9D100'
-      default:
-        return '#66E900'
-    }
-  }, [vote])
 
   return (
     <Consumer>
@@ -58,16 +46,24 @@ function Movie({ img, title, overview, date, genreId, vote, idForRate, onRate }:
               type="circle"
               percent={vote * 10}
               format={(percent?: number): string => {
-                if(!percent) {
+                if (!percent) {
                   return ''
                 }
                 return (percent / 10).toFixed(1)
               }}
-              strokeColor={ratingColor}
+              strokeColor={
+                vote >= 0 && vote <= 3
+                  ? '#E90000'
+                  : vote > 3 && vote <= 5
+                    ? '#E97E00'
+                    : vote > 5 && vote <= 7
+                      ? '#E9D100'
+                      : '#66E900'
+              }
               className="movie-info__rate"
             />
             <div className="box">
-              <h1 className="box__title">{title}</h1>
+              <p className="box__title">{title}</p>
               <p className="box__date">{date ? format(new Date(date), 'MMM dd, yyyy') : 'No data'}</p>
               {genres.map((genre: Genre) => {
                 if (genreId.includes(genre.id)) {
@@ -99,4 +95,4 @@ function Movie({ img, title, overview, date, genreId, vote, idForRate, onRate }:
   )
 }
 
-export default React.memo(Movie)
+export default Movie
