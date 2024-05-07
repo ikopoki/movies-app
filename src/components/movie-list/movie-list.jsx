@@ -10,11 +10,10 @@ import MovieItem from '../movie/movie'
 import './movie-list.scss'
 
 const MovieList = ({ moviesData, onRate }) => {
-
   const elem = moviesData.map((item) => (
     <MovieItem
       key={item.id}
-      img={item.poster_path}  
+      img={item.poster_path}
       title={item.title}
       overview={item.overview}
       date={item.release_date}
@@ -38,7 +37,7 @@ MovieList.defaultProps = {
       release_date: PropTypes.string.isRequired,
       genre_ids: PropTypes.arrayOf(PropTypes.number),
       vote_average: PropTypes.number.isRequired,
-    }),
+    })
   ),
   onRate: PropTypes.func.isRequired,
 }

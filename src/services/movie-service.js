@@ -53,7 +53,7 @@ const createMovieService = (apiKey) => {
   const getRatedMovies = async (page = 1) => {
     try {
       const token = localStorage.getItem('token')
-      const data = await fetch(`${apiBase}/guest_session/${token}/rated/movies?api_key=${apiKey}&page=${page}`) 
+      const data = await fetch(`${apiBase}/guest_session/${token}/rated/movies?api_key=${apiKey}&page=${page}`)
       if (data.status === 404) {
         return null
       }

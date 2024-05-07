@@ -91,7 +91,7 @@ export default function App() {
       const dataGenre = await movieService.getGenres()
       const ratedMovies = await movieService.getRatedMovies()
 
-      if(ratedMovies !== null && ratedMovies.results !== undefined) {
+      if (ratedMovies !== null && ratedMovies.results !== undefined) {
         setRate(ratedMovies.results)
       }
 
@@ -113,7 +113,7 @@ export default function App() {
       await movieService.deleteRating(id)
       localStorage.removeItem(id)
       const ratedMovies = await movieService.getRatedMovies()
-      if(ratedMovies !== null && ratedMovies.results !== undefined) {
+      if (ratedMovies !== null && ratedMovies.results !== undefined) {
         setRate(ratedMovies.results)
       }
     }
@@ -147,12 +147,7 @@ export default function App() {
   if (moviesData.length === 0 && searchQuery.length !== 0 && !loading && !error) {
     return (
       <>
-        <Input
-          placeholder="Type to search..."
-          onChange={onSearchChange}
-          value={searchQuery}
-          autoFocus
-        />
+        <Input placeholder="Type to search..." onChange={onSearchChange} value={searchQuery} autoFocus />
         <Alert message="No results found" type="error" showIcon />
       </>
     )
@@ -196,7 +191,7 @@ export default function App() {
     <div className="main">
       <Provider value={genres}>
         <Online>
-          <Tabs defaultActiveKey='1' items={items} onChange={onTabsChange} />
+          <Tabs defaultActiveKey="1" items={items} onChange={onTabsChange} />
         </Online>
         <Offline>
           <Alert message="Damn dude its 2024 and u got no money for the internet?" type="error" />
