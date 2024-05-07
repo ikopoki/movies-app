@@ -10,11 +10,10 @@ import MovieItem from '../movie/movie'
 import './movie-list.scss'
 
 const MovieList = ({ moviesData, onRate }) => {
-  const maxId = () => Math.random().toString(36).slice(2)
 
   const elem = moviesData.map((item) => (
     <MovieItem
-      key={maxId()}
+      key={item.id}
       img={item.poster_path}  
       title={item.title}
       overview={item.overview}

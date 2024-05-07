@@ -61,7 +61,7 @@ function Movie({ img, title, overview, date, genreId, vote, idForRate, onRate })
             />
             <div className="box">
               <p className="box__title">{title}</p>
-              <p className="box__date">{date ? format(new Date(date), 'MMM dd, yyyy') : 'No data'}</p>
+              <time className="box__date">{date ? format(new Date(date), 'MMM dd, yyyy') : 'No data'}</time>
               {genres.map((genre) => {
                 if (genreId.includes(genre.id)) {
                   return (
