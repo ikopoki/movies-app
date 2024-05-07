@@ -63,7 +63,7 @@ const createMovieService = (apiKey) => {
     const data = await fetch(
       `${apiBase}/guest_session/${token}/rated/movies?api_key=${apiKey}&page=${page}`,
     )
-    return data.response ? data.json() : null
+    return data.status === 200 ? data.json() : null
   }
 
   const getLocalGuestSessionToken = () => {

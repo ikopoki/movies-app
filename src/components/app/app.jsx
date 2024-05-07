@@ -90,7 +90,7 @@ export default function App() {
 
       const dataGenre = await movieService.getGenres()
       const ratedMovies = await movieService.getRatedMovies()
-      if (dataGenre !== null  && ratedMovies !== null) {
+      if (dataGenre !== null  && ratedMovies !==  null) {
         setRate(ratedMovies.results)
         setGenres(dataGenre.genres)
       }
