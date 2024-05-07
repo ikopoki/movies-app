@@ -5,6 +5,7 @@
 /* eslint-disable react/function-component-definition */
 import React from 'react'
 import PropTypes from 'prop-types'
+import { Alert } from 'antd'
 import MovieItem from '../movie/movie'
 import './movie-list.scss'
 
@@ -24,7 +25,8 @@ const MovieList = ({ moviesData, onRate }) => {
       onRate={onRate}
     />
   ))
-  return <ul className="all-content">{elem === undefined ? null : elem}</ul>
+  const error = <Alert message="No rated movies was found, please rate some movies" type="error" showIcon />
+  return <ul className="all-content">{elem === undefined ? error : elem}</ul>
 }
 
 MovieList.propTypes = {
