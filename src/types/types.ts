@@ -19,10 +19,13 @@ export type MovieData = {
 
 export type MovieDataList = {
     img: string
+    poster_path: string
     title: string
     overview: string
     date: string
+    release_date: string
     genreId: number[]
+    genre_ids: number[]
     vote: number
     idForRate: string
     onRate: Function
