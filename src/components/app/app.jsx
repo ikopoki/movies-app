@@ -89,11 +89,6 @@ export default function App() {
       }
 
       const dataGenre = await movieService.getGenres()
-      const ratedMovies = await movieService.getRatedMovies()
-
-      if (ratedMovies !== null && ratedMovies.results !== undefined) {
-        setRate(ratedMovies.results)
-      }
 
       setGenres(dataGenre.genres)
     }
@@ -105,17 +100,9 @@ export default function App() {
     if (value > 0) {
       await movieService.postMovieRating(id, value)
       movieService.setLocalRating(id, value)
-      const ratedMovies = await movieService.getRatedMovies()
-      if (ratedMovies !== null && ratedMovies.results !== undefined) {
-        setRate(ratedMovies.results)
-      }
     } else {
       await movieService.deleteRating(id)
       localStorage.removeItem(id)
-      const ratedMovies = await movieService.getRatedMovies()
-      if (ratedMovies !== null && ratedMovies.results !== undefined) {
-        setRate(ratedMovies.results)
-      }
     }
   }
 
@@ -129,10 +116,9 @@ export default function App() {
         total={totalResults}
         onChange={onPaginationChange}
         pageSize={20}
-        showSizeChanger={false}
+        showSizeChanger={false} 
       />
     ) : null
-
   const paginationPanelRated = !error ? (
     <Pagination
       current={currentPageRate}
@@ -153,8 +139,12 @@ export default function App() {
     )
   }
 
-  const onTabsChange = (active) => {
+  const onTabsChange = async (active) => {
     if (active === '2') {
+      const ratedMovies = await movieService.getRatedMovies()
+      if (ratedMovies !== null && ratedMovies.results !== undefined) {
+        setRate(ratedMovies.results)
+      }
       loadRatedMovies(1)
     }
     if (active === '1') {
@@ -172,7 +162,7 @@ export default function App() {
           {spinner}
           {content}
           {errorIndicator}
-          {paginationPanelSearch}
+          <div className='pag'>{paginationPanelSearch}</div>
         </>
       ),
     },
@@ -181,8 +171,8 @@ export default function App() {
       label: `Rated`,
       children: (
         <>
-          {paginationPanelRated}
           <MovieList moviesData={rate} onRate={onRate} />
+          <div className='pag'>{paginationPanelRated}</div>
         </>
       ),
     },

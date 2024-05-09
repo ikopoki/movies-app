@@ -20,6 +20,7 @@ const createMovieService = (apiKey) => {
   }
 
   const getQuestSession = async () => {
+    localStorage.clear()
     const data = await fetch(`https://api.themoviedb.org/3/authentication/guest_session/new?api_key=${apiKey}`)
     return data.json()
   }
