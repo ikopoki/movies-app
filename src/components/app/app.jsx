@@ -105,7 +105,6 @@ export default function App() {
       localStorage.removeItem(id)
     }
   }
-
   const spinner = loading ? <Spin /> : null
   const content = !loading ? <MovieList moviesData={moviesData} onRate={onRate} /> : null
   const errorIndicator = error ? <ErrorIndicator /> : null
@@ -113,14 +112,15 @@ export default function App() {
     !loading && !error && searchQuery ? (
       <Pagination
         current={currentPage}
-        total={totalResults}
+        total={totalResults * 10}
         onChange={onPaginationChange}
-        pageSize={20}
+        pageSize={10}
         showSizeChanger={false} 
       />
-    ) : null
+    ) : null  
   const paginationPanelRated = !error ? (
     <Pagination
+      defaultCurrent={1}
       current={currentPageRate}
       total={totalResultsRate}
       onChange={onPaginationChangeRate}

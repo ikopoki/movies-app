@@ -20,13 +20,13 @@ const createMovieService = (apiKey) => {
   }
 
   const getQuestSession = async () => {
-    localStorage.clear()
+    sessionStorage.clear()
     const data = await fetch(`https://api.themoviedb.org/3/authentication/guest_session/new?api_key=${apiKey}`)
     return data.json()
   }
 
   const postMovieRating = async (movieId, rating) => {
-    const token = localStorage.getItem('token')
+    const token = sessionStorage.getItem('token')
     const data = await fetch(`${apiBase}/movie/${movieId}/rating?api_key=${apiKey}&guest_session_id=${token}`, {
       method: 'POST',
       headers: {
@@ -40,7 +40,7 @@ const createMovieService = (apiKey) => {
   }
 
   const deleteRating = async (movieId) => {
-    const token = localStorage.getItem('token')
+    const token = sessionStorage.getItem('token')
     const data = await fetch(`${apiBase}/movie/${movieId}/rating?api_key=${apiKey}&guest_session_id=${token}`, {
       method: 'DELETE',
       headers: {
@@ -53,9 +53,12 @@ const createMovieService = (apiKey) => {
   // eslint-disable-next-line consistent-return
   const getRatedMovies = async (page = 1) => {
     try {
-      const token = localStorage.getItem('token')
+      const token = sessionStorage.getItem('token')
       const data = await fetch(`${apiBase}/guest_session/${token}/rated/movies?api_key=${apiKey}&page=${page}`)
       if (data.status === 404) {
+        return null
+      }
+      if (data.status === 401) {
         return null
       }
       return data.json()
@@ -66,19 +69,19 @@ const createMovieService = (apiKey) => {
   }
 
   const getLocalGuestSessionToken = () => {
-    return localStorage.getItem('token')
+    return sessionStorage.getItem('token')
   }
 
   const setLocalGuestSessionToken = (token) => {
-    localStorage.setItem('token', token)
+    sessionStorage.setItem('token', token)
   }
 
   const setLocalRating = (id, value) => {
-    localStorage.setItem(id, value)
+    sessionStorage.setItem(id, value)
   }
 
   const getLocalRating = (id) => {
-    return +localStorage.getItem(id)
+    return +sessionStorage.getItem(id)
   }
 
   return {

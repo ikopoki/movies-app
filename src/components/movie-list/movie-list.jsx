@@ -10,7 +10,7 @@ import MovieItem from '../movie/movie'
 import './movie-list.scss'
 
 const MovieList = ({ moviesData, onRate }) => {
-  const elem = moviesData.map((item) => (
+  const elem = moviesData.length ? moviesData.map((item) => (
     <MovieItem
       key={item.id}
       img={item.poster_path}
@@ -22,9 +22,9 @@ const MovieList = ({ moviesData, onRate }) => {
       idForRate={item.id}
       onRate={onRate}
     />
-  ))
+  )) : false
   const error = <Alert message="No rated movies was found, please rate some movies" type="error" showIcon />
-  return <ul className="all-content">{elem === undefined ? error : elem}</ul>
+  return <ul className="all-content">{!elem.length ? error : elem}</ul>
 }
 
 MovieList.defaultProps = {
